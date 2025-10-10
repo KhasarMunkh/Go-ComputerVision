@@ -1,4 +1,4 @@
-2) Choose an 8-bit colored image and convert it to a grayscale image. Explain your
+1) Choose an 8-bit colored image and convert it to a grayscale image. Explain your
 approach and show the input and output image.
 
 **Approach:**
