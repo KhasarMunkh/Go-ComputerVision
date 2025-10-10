@@ -94,7 +94,7 @@ func AddGaussianNoise(src *image.Gray, sigma float64, rng *rand.Rand) *image.Gra
 	return dst
 }
 
-func question1(path string, out string) {
+func question1(path string, out string) (gray_img *image.Gray) {
 	original_img, err := loadImage(path)
 	if err != nil {
 		log.Fatal(err)
@@ -104,6 +104,7 @@ func question1(path string, out string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return gray_image
 }
 
 func question2(gray_image *image.Gray) {
@@ -194,6 +195,13 @@ func question5(gray_image *image.Gray, out_prefix string) {
 }
 
 func main() {
+	gray_img := question1("assets/apple.jpg", "output/gray_apple.png")
+	question2(gray_img)
+	question3(gray_img)
+	question4(gray_img, "output/gauss_sigma_50")
+	question4(gray_img, "output/saltpepper_30")
+
+
 	gray_img_gauss_sigma_50, err := loadImage("output/gauss_sigma_50.png")
 	if err != nil {
 		log.Fatal(err)
@@ -202,11 +210,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// question1("assets/apple.jpg", "output/gray_apple.png")
-	// question2(gray_img.(*image.Gray))
-	// question3(gray_img.(*image.Gray))
-	// question4(gray_img.(*image.Gray), "output/gauss_sigma_50")
-	// question4(gray_img.(*image.Gray), "output/saltpepper_30")
+
 	question5(gray_img_gauss_sigma_50.(*image.Gray), "output/gauss_sigma_50")
 	question5(gray_img_saltpepper_30.(*image.Gray), "output/saltpepper_30")
 }

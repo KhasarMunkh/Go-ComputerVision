@@ -27,11 +27,13 @@ type GaussianFilter struct {
 func (f BoxFilter) Name() string {
 	return fmt.Sprintf("box-%dx%d", f.KernelSize, f.KernelSize)
 }
+
 func (f MedianFilter) Name() string {
 	return fmt.Sprintf("median-%dx%d", f.KernelSize, f.KernelSize)
 }
+
 func (f GaussianFilter) Name() string {
-	return fmt.Sprintf("box-%dx%d-sigma%.2f", f.KernelSize, f.KernelSize, f.Sigma)
+	return fmt.Sprintf("gauss-%dx%d-sigma%.2f", f.KernelSize, f.KernelSize, f.Sigma)
 }
 
 func (f BoxFilter) Apply(src *image.Gray) *image.Gray {
@@ -110,70 +112,74 @@ func (f MedianFilter) Apply(src *image.Gray) *image.Gray {
 	}
 	return dst
 }
+
 func (f GaussianFilter) Apply(src *image.Gray) *image.Gray {
 	rect := src.Bounds()
 	dst := image.NewGray(rect)
 	w := rect.Dx()
 	h := rect.Dy()
-	r := f.KernelSize / 2 // radius = (kernel size - 1)/2
+	k := f.KernelSize
+	r := k / 2 // radius = (kernel size - 1)/2
 
 	// build the Gaussian kernel!
 	// G(x, y) = (1 / (2 * π * σ^2)) * exp(-(x^2 + y^2) / (2 * σ^2))
 	//\(G(x,y)\) represents the value of the Gaussian kernel at coordinates \((x,y)\) relative to the center of the kernel.
-	gaussian_kernel := make([][]float64, f.KernelSize)
+	gaussian_kernel := make([][]float64, k)
 	for i := range gaussian_kernel {
-		gaussian_kernel[i] = make([]float64, f.KernelSize)
+		gaussian_kernel[i] = make([]float64, k)
 	}
 	sigma_squared := f.Sigma * f.Sigma
 	kernal_sum := 0.0
-	for j := -r; j <= r; j++ {
-		for i := -r; i <= r; i++ {
-			v := (1.0 / (2 * math.Pi * sigma_squared)) * (math.Exp(-(float64(i*i + j*j)) / (2 * sigma_squared)))
-			gaussian_kernel[j+r][i+r] = v
+
+	for y := 0; y < k; y++ {
+		dy := y - r
+		for x := 0; x < k; x++ {
+			dx := x - r
+			v := (1.0 / (2 * math.Pi * sigma_squared)) * (math.Exp(-(float64(dx*dx + dy*dy)) / (2 * sigma_squared)))
+			gaussian_kernel[y][x] = v
 			kernal_sum += v
 		}
 	}
 	// Normalize the kernel using the sum of the kernel values
-	for j := -r; j <= r; j++ {
-		for i := -r; i <= r; i++ {
-			gaussian_kernel[j+r][i+r] /= kernal_sum
+	for y := 0; y < k; y++ {
+		for x := 0; x < k; x++ {
+			gaussian_kernel[y][x] /= kernal_sum
 		}
 	}
 
-	for y := range h {
-		for x := range w {
-			sum := 0
+	for y:= 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			sum := 0.0
 			// Iterate over filter kernel
 			// if the kernel goes out of bounds, we use the nearest edge pixel
 			// This is done by clamping the indices to the image bounds
-			for j := -r; j <= r; j++ {
-				yy := y + j
+			for j := 0; j < k; j++ {
+				dy := j - r
+				yy := y + dy
 				if yy < 0 {
 					yy = 0
 				} else if yy >= h {
 					yy = h - 1
 				}
-				for i := -r; i <= r; i++ {
-					xx := x + i
+				for i := 0; i < k; i++ {
+					dx := i - r 
+					xx := x + dx
 					if xx < 0 {
 						xx = 0
 					} else if xx >= w {
 						xx = w - 1
 					}
-					weight := gaussian_kernel[j+r][i+r]
-					sum += int(float64(src.Pix[yy*src.Stride+xx]) * weight)
+					weight := gaussian_kernel[j][i]
+					sum += float64(src.Pix[y*src.Stride+x]) * weight
 				}
 			}
 			if sum < 0 {
-				fmt.Println("sum < 0")
 				sum = 0
 			} else if sum > 255 {
-				fmt.Println("sum > 255")
 				sum = 255
 			}
-			dst.Pix[y*dst.Stride+x] = uint8(sum)
+			dst.Pix[y*dst.Stride+x] = uint8(math.Round(sum))
 		}
 	}
 	return dst
 }
-
