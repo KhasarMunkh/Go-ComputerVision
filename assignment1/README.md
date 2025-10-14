@@ -174,14 +174,54 @@ type GaussianFilter struct {
 }
 ```
 
+I implemented a helper function `getKernelPixels` to extract the pixel values in the kernel around a given pixel.
+It takes the source image, the x and y position of the center pixel, and the kernel size as input.
+It returns a slice of pixel values in the kernel. This will be used by our filters to get the pixel values in the kernel.
+
+When iterating over the kernel, we handle the borders by clamping the indices to the image bounds. We check if the kernel goes out of bounds, and if it does, we use the nearest edge pixel.
+At each position in the kernel, we add the pixel value to `values`.
+Once the kernel is processed, we return the `values` slice to be used by the filters.
+```go 
+func getKernelPixels(src *image.Gray, x_pos, y_pos, k int) []uint8 {
+    w, h := src.Bounds().Dx(), src.Bounds().Dy() // width and height of the image in pixels
+    r := k / 2 // radius of the kernel
+    values := make([]uint8, 0, k*k)
+    // Iterate over filter kernel
+    // if the kernel goes out of bounds, we use the nearest edge pixel
+    // This is done by clamping the indices to the image bounds
+    // For even kernel sizes, we use floor(k/2) as the radius which means
+    // the kernel will be slightly biased towards the top-left corner.
+    // For example, for a 4x4 kernel, the radius is 2, so the kernel will cover
+    // the pixels from (x-2, y-2) to (x+1, y+1)
+    for j := range k {
+        dy := j - r
+        yy := y_pos + dy
+        if yy < 0 {
+            yy = 0
+        } else if yy >= h {
+            yy = h - 1
+        }
+        row := yy * src.Stride
+        for i := range k {
+            dx := i - r
+            xx := x_pos + dx
+            if xx < 0 {
+                xx = 0
+            } else if xx >= w {
+                xx = w - 1
+            }
+            values = append(values, src.Pix[row+xx])
+        }
+    }
+    return values
+}
+```
+
 Below is the implementation of the Box Filter. The Box Filter computes the average of the pixels in the kernel
 and assigns it to the center pixel. 
 
-First, we create a new destination image of the dimensions as the source image.
+First, we create a new destination image of the same dimensions as the source image.
 We take the width and height of the image which will be used to iterate over each pixel of the source image.
-We also find the radius of the kernel which is half the kernel size.
-The radius r is used to determine the bounds of the kernel around the center pixel.
-This will be useful when at the borders of the image.
 These steps will be the same for all three filters.
 ```go
 func (f BoxFilter) Apply(src *image.Gray) *image.Gray {
@@ -189,42 +229,31 @@ func (f BoxFilter) Apply(src *image.Gray) *image.Gray {
     dst := image.NewGray(rect)
     w := rect.Dx()
     h := rect.Dy()
-    r := f.KernelSize / 2 // radius = (kernel size - 1)/2
 ```
 
-Next, we iterate over each pixel in the source image.
-At each pixel, we initialize a `sum` variable to accumulate the pixel values in the kernel.
+Next, we iterate over every pixel in the source image.
+At each pixel, we set a `sum` variable to accumulate the pixel values in the kernel.
 ```go
+    sum := 0
     for y := range h {
         for x := range w {
-            sum := 0
+            sum = 0
 ```
 
-Inside the pixel loop, we iterate over the filter kernel. Here, we handle the borders by clamping the indices to the image bounds. We check if the kernel goes out of bounds, and if it does, we use the nearest edge pixel.
-At each position in the kernel, we add the pixel value to the `sum`.
-Once the kernel is processed, we compute the average by dividing the `sum` by the total number of pixels in the kernel.
+Inside the pixel loop, we call `getKernelPixels` and store the resulting pixel slice in `kernel_pixels`.
+We then sum the pixel values in the kernel and compute the average by dividing the `sum` by the total number of pixels in the kernel.
 We set the pixel in the destination image to the computed average and repeat for all pixels.
 And finally, we return the filtered image.
 ```go 
-            for j := -r; j <= r; j++ {
-                yy := y + j
-                if yy < 0 {
-                    yy = 0
-                } else if yy >= h {
-                    yy = h - 1
-                }
-                for i := -r; i <= r; i++ {
-                    xx := x + i
-                    if xx < 0 {
-                        xx = 0
-                    } else if xx >= w {
-                        xx = w - 1
-                    }
-                    sum += int(src.Pix[yy*src.Stride+xx])
-                }
+    for y := range h {
+        for x := range w {
+            kernal_pixels := getKernelPixels(src, x, y, f.KernelSize)
+            sum := 0
+            for _, v := range kernal_pixels {
+                sum += int(v)
             }
             // Compute average and set pixel
-            avg := sum / (f.KernelSize * f.KernelSize)
+            avg := sum / len(kernal_pixels)
             dst.Pix[y*dst.Stride+x] = uint8(avg)
         }
     }
@@ -234,26 +263,13 @@ And finally, we return the filtered image.
 
 Since the `MedianFilter` implementation is very similar to the `BoxFilter`, I will only highlight the differences.
 The main difference is that instead of computing the average of the pixels in the kernel, we compute the median.
-For this, we need to store the pixel values in a slice, sort the slice, and find the median.
-
-So, we create a slice `window` to hold the pixel values in the kernel.
+For this, we simply take the pixel values in the kernel as a slice, sort it, and find the median.
+Set the pixel in the destination image to the computed median and repeat for all pixels.
 ```go 
-window := make([]uint8, 0, f.KernelSize*f.KernelSize)
-```
-
-Then, inside the pixel loop, we clear the `window` slice and then iterate over the filter kernel in the same fashion as before. 
-The only difference is that we append the pixel values in the kernel to the `window` slice instead of summing them.
-Find the median and set the pixel in the destination image.
-```go 
-    for y := range h {
-        for x := range w {
-            window = window[:0] // clear window, avoids reallocations
-            // Iterate over filter kernel
-                window = append(window, src.Pix[yy*src.Stride+xx])
-            }
+            kernel_pixels := getKernelPixels(src, x, y, f.KernelSize)
             // Compute median and set pixel
-            slices.Sort(window)
-            median := window[len(window)/2]
+            slices.Sort(kernel_pixels)
+            median := kernel_pixels[len(kernel_pixels)/2]
             dst.Pix[y*dst.Stride+x] = median
         }
     }
@@ -263,85 +279,82 @@ Find the median and set the pixel in the destination image.
 ```
 
 The `GaussianFilter` implementation is also similar to the `BoxFilter` but slightly more complex.
-First, we need to build the Gaussian kernel based on the specified kernel size and sigma.
-The Gaussian kernel is a 2D array of weights that will be used to compute the weighted average of the pixels in the kernel.
+First, we need to build the Gaussian kernel based on the specified `KernelSize` and `Sigma`.
+The Gaussian kernel is a 1D array of weights that will be used to compute the weighted average of the pixels in the kernel.
 
-The Gaussian kernel is computed using the formula:
-$$
-\Large G(x, y) = \frac{1}{2\pi\sigma^2} e^{-\frac{x^2 + y^2}{2\sigma^2}}
-$$
-The result is a 2D array of size `KernelSize x KernelSize` that stores the weight each pixel in the kernel contributes to the final value of the center pixel.
+Below is the `buildGaussianKernel` function that constructs the Gaussian kernel.
+We first check if `sigma` is less than or equal to 0, and if so, we set it to `KernelSize/6.0`.
+We then create a slice `kernel` to hold the kernel values and a `sum` variable to accumulate the sum of the kernel values for normalization.
+If we do not normalize, the resulting pixel values may be too bright or too dark.
+To normalize the kernel, we divide each value in the kernel by the sum of all the values.
+The kernel is built using two nested loops that iterate over the kernel size and compute the Gaussian value for each position in the kernel using the Gaussian formula.
+The resulting output is a 1D array of size `KernelSize * KernelSize` that stores the weight each pixel in the kernel contributes to the final value of the center pixel.
 ```go 
-    gaussian_kernel := make([][]float64, k)
-    for i := range gaussian_kernel {
-        gaussian_kernel[i] = make([]float64, k)
+func buildGaussianKernel(k int, sigma float64) []float64 {
+    if sigma <= 0 {
+        sigma = float64(k) / 6.0
     }
-    sigma_squared := f.Sigma * f.Sigma
-    kernal_sum := 0.0
-
+    r := k / 2
+    kernel := make([]float64, k*k)
+    sum := 0.0
+    idx := 0
+    // build the Gaussian kernel!
+    // G(x, y) = (1 / (2 * π * σ^2)) * exp(-(x^2 + y^2) / (2 * σ^2))
+    //\(G(x,y)\) represents the value of the Gaussian kernel at coordinates \((x,y)\) relative to the center of the kernel.
     for y := 0; y < k; y++ {
         dy := y - r
         for x := 0; x < k; x++ {
             dx := x - r
-            v := (1.0 / (2 * math.Pi * sigma_squared)) 
-            v = v * (math.Exp(-(float64(dx*dx + dy*dy)) / (2 * sigma_squared)))
-            gaussian_kernel[y][x] = v
-            kernal_sum += v
+            v := math.Exp(-(float64(dx*dx + dy*dy)) / (2.0 * sigma * sigma)) // unnormalized
+            kernel[idx] = v
+            sum += v
+            idx++
         }
     }
-```
-
-However, the sum of the kernel values may not be equal to 1. 
-This is important because we want the weighted average to be a proper average.
-Otherwise, the resulting pixel values may be too bright or too dark.
-To normalize the kernel, we divide each value in the kernel by the sum of all the values.
-```go 
-    // Normalize the kernel using the sum of the kernel values
-    for y := 0; y < k; y++ {
-        for x := 0; x < k; x++ {
-            gaussian_kernel[y][x] /= kernal_sum
-        }
+    // Normalize the kernel so that the sum is 1
+    inv := 1.0 / sum
+    for i := range kernel {
+        kernel[i] *= inv
     }
+    return kernel
+}
 ```
 
-Finally, we can iterate over each pixel in the source image and apply the Gaussian filter.
-We initialize a `sum` variable to accumulate the weighted pixel values in the kernel.
-When applying the filter, we multiply each pixel value by its corresponding weight in the Gaussian kernel and add it to the `sum`.
-After processing the kernel, we clamp the `sum` to the range $[0, 255]$ and set the pixel in the destination image to `sum`.
+Now we can implement the `Apply` method for the `GaussianFilter`.
+It starts similarly to the other filters by creating a new destination image and getting the width and height of the image.
+After setting up the destination image, we build the Gaussian kernel using the `buildGaussianKernel` function.
 ```go 
-    // Iterate over each pixel in the source image
-    for y:= 0; y < h; y++ {
+func (f GaussianFilter) Apply(src *image.Gray) *image.Gray {
+    rect := src.Bounds()
+    dst := image.NewGray(rect)
+    w := rect.Dx()
+    h := rect.Dy()
+    k := f.KernelSize
+
+    wieghts := buildGaussianKernel(k, f.Sigma)
+```
+
+We iterate over each pixel in the source image and apply the Gaussian filter.
+Since the kernel `weights` is already normalized, we can directly use it to compute the weighted sum of the pixels within the kernel's range. 
+Since `kernel_pixels` and `weights` are both 1D arrays of the same length, we can simply multiply each pixel value by its corresponding weight and accumulate the result in `kernel_sum`.
+The `kernel_sum` is then assigned to the pixel in the destination image.
+```go 
+    for y := 0; y < h; y++ {
         for x := 0; x < w; x++ {
-            sum := 0.0
-            // Iterate over filter kernel
-            // if the kernel goes out of bounds, we use the nearest edge pixel
-            // This is done by clamping the indices to the image bounds
-            for j := 0; j < k; j++ {
-                dy := j - r
-                yy := y + dy
-                if yy < 0 {
-                    yy = 0
-                } else if yy >= h {
-                    yy = h - 1
-                }
-                for i := 0; i < k; i++ {
-                    dx := i - r 
-                    xx := x + dx
-                    if xx < 0 {
-                        xx = 0
-                    } else if xx >= w {
-                        xx = w - 1
-                    }
-                    weight := gaussian_kernel[j][i]
-                    sum += float64(src.Pix[y*src.Stride+x]) * weight
-                }
+            kernal_pixels := getKernelPixels(src, x, y, f.KernelSize)
+            kernel_sum := 0.0
+            for i, v := range kernal_pixels {
+                kernel_sum += float64(v) * wieghts[i]
             }
-            if sum < 0 {
-                sum = 0
-            } else if sum > 255 {
-                sum = 255
-            }
-            dst.Pix[y*dst.Stride+x] = uint8(math.Round(sum))
+            // debugging
+            // if kernel_sum < 0 {
+            //  fmt.Println("negative value in gaussian filter:", kernel_sum)
+            //  kernel_sum = 0
+            // } else if kernel_sum > 255 {
+            //  fmt.Println("overflow value in gaussian filter:", kernel_sum)
+            //  kernel_sum = 255
+            // }
+            dst.Pix[y*dst.Stride+x] = uint8(math.Round(kernel_sum))
         }
     }
     return dst

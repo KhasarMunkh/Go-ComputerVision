@@ -81,7 +81,7 @@ func (f GaussianFilter) Apply(src *image.Gray) *image.Gray {
 	h := rect.Dy()
 	k := f.KernelSize
 
-	wieghts := buildGaussianKernelFlat(k, f.Sigma)
+	wieghts := buildGaussianKernel(k, f.Sigma)
 
 	for y := 0; y < h; y++ {
 		for x := 0; x < w; x++ {
@@ -90,13 +90,14 @@ func (f GaussianFilter) Apply(src *image.Gray) *image.Gray {
 			for i, v := range kernal_pixels {
 				kernel_sum += float64(v) * wieghts[i]
 			}
-			if kernel_sum < 0 {
-				fmt.Println("negative value in gaussian filter:", kernel_sum)
-				kernel_sum = 0
-			} else if kernel_sum > 255 {
-				fmt.Println("overflow value in gaussian filter:", kernel_sum)
-				kernel_sum = 255
-			}
+			// debugging
+			// if kernel_sum < 0 {
+			//	fmt.Println("negative value in gaussian filter:", kernel_sum)
+			//	kernel_sum = 0
+			// } else if kernel_sum > 255 {
+			//	fmt.Println("overflow value in gaussian filter:", kernel_sum)
+			//	kernel_sum = 255
+			// }
 			dst.Pix[y*dst.Stride+x] = uint8(math.Round(kernel_sum))
 		}
 	}
@@ -133,7 +134,7 @@ func getKernelPixels(src *image.Gray, x_pos, y_pos, k int) []uint8 {
 
 // builds a flattened Gaussian kernel of size k x k with standard deviation sigma.
 // The kernel is normalized so that the sum of all its elements equals 1.
-func buildGaussianKernelFlat(k int, sigma float64) []float64 {
+func buildGaussianKernel(k int, sigma float64) []float64 {
 	if sigma <= 0 {
 		sigma = float64(k) / 6.0
 	}
