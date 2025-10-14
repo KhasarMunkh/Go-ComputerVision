@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	_ "image/jpeg" // ✅ registers JPEG decoder (optional)
-	"image/png"    // ✅ gives access to png.Encode
+	_ "image/jpeg"
+	"image/png"
 	"log"
 	"math/rand"
 	"os"
@@ -155,6 +155,7 @@ func question3(gray_image *image.Gray) {
 		log.Println("Saved:", outPath)
 	}
 }
+
 func question4(gray_image *image.Gray, out_prefix string) {
 	bf := BoxFilter{KernelSize: 3}
 	mf := MedianFilter{KernelSize: 3}
@@ -200,7 +201,6 @@ func main() {
 	question3(gray_img)
 	question4(gray_img, "output/gauss_sigma_50")
 	question4(gray_img, "output/saltpepper_30")
-
 
 	gray_img_gauss_sigma_50, err := loadImage("output/gauss_sigma_50.png")
 	if err != nil {
