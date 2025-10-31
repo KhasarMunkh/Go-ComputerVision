@@ -156,153 +156,71 @@ gradient_magnitude_normalized = (
 ##### After Gaussian Smoothing (5×5 kernel)
 ![Smoothed Building](output_part_a/2_building_smoothed.jpg)
 
-The smoothing reduces noise while preserving major structural features. Fine details are slightly blurred.
+The smoothing reduces noise while preserving major features. Fine details are slightly blurred.
 
 ##### Gradient Gx (Horizontal Gradient - Vertical Edges)
 ![Gx Gradient](output_part_a/3_x_gradient.jpg)
 
-Highlights vertical features:
-- Left and right building edges
-- Vertical window frames
-- Tree outline
+As seen in the image, the Gx gradient highlights vertical edges effectively. 
+This is expected since Gx responds to changes in intensity along the x-direction and the building has strong vertical structures.
+The background sky is dark due to low gradient values meaning little change in intensity.
 
 ##### Gradient Gy (Vertical Gradient - Horizontal Edges)
 ![Gy Gradient](output_part_a/4_y_gradient.jpg)
 
-Highlights horizontal features:
-- Roof line
-- Horizontal window frame edges
-- Ground-building interface
+The Gy gradient effectively captures horizontal edges in the image. You can see how the vertical edges are less pronounced here and how the 
+horizontal features such as the window frames stand out.
 
 ##### Edge Magnitude (Final Result)
 ![Edge Detection Result](output_part_a/5_edge_magnitude.jpg)
 
-The final edge detection successfully identifies:
-- ✓ Complete building perimeter
-- ✓ All window frames (3 rows × 8 columns)
-- ✓ Door and roof structure
-- ✓ Tree outline on left side
-- ✓ Architectural details
-
-**Edge characteristics:**
-- Edges are continuous and well-connected
-- Strong edges appear bright, weak edges darker
-- Minimal false positives in smooth regions
-- Orientation-independent (all angles detected equally)
+The final image combining both Gx and Gy shows a comprehensive edge map of the building.
 
 ##### Complete Pipeline Visualization
 ![Complete Pipeline](output_part_a/6_complete_pipeline.png)
 
 ---
 
-### Analysis:
-
-1. **Gradient Components:**
-   - **Gx:** Strongly responds to vertical building edges and window frames
-   - **Gy:** Clearly detects horizontal roof line and window edges
-   - Both show good contrast between edges and background
-
-2. **Edge Magnitude:** 
-   - All major structural boundaries detected
-   - Edge thickness: 2-3 pixels (typical for Sobel without thinning)
-   - Good signal-to-noise ratio
-   - No visible artifacts from border handling
-
----
-
 ## Part B: Hybrid Images
-
-**b) For this part of the assignment, you can use any computer vision library that you want (e.g., OpenCV). The objective will be to build a hybrid image, as described here: http://olivalab.mit.edu/publications/OlivaTorralb_Hybrid_Siggraph06.pdf**
-
-**Apply a low-pass filter to image A to obtain an image similar to image B. Experiment with different cutoff frequencies.**
-
-**Apply a high-pass filter to image C to obtain an image similar to image D. Experiment with different cutoff frequencies.**
-
-**You can implement the low and high-pass filters in any way you like, for example, by doing a convolution with a Gaussian kernel (might be easier) or in frequency domain. Describe your approach.**
-
-**Add the low-pass and high-pass images together and see if you get a hybrid image, where the high-frequency image dominates perception at shorter distances, and the low-frequency image dominates perception at greater distances. Describe your results.**
-
----
 
 ### Approach:
 
-**Method:** Spatial domain filtering using Gaussian convolution
-
-**Algorithm:**
-1. **Low-pass filter:** Gaussian blur to retain low frequencies (overall shape)
-2. **High-pass filter:** Original - Low-pass to extract high frequencies (details)
-3. **Hybrid image:** Low-pass(Elephant) + High-pass(Cheetah)
-
-**Why spatial domain?**
-- Simpler and more intuitive than frequency domain (FFT)
-- Direct parameter control via sigma
-- Efficient for moderate kernel sizes
-- No ringing artifacts from ideal filters
+The implementation of the low-pass and high-pass filters is done in the spatial domain using convolution.
+OpenCV's built-in functions (like `GaussianBlur`) were utilized for efficiency and simplicity.
 
 #### Low-Pass Filter Implementation
 
-Apply Gaussian blur using OpenCV for efficiency:
-
+The implementation for the low-pass filter is below. We use OpenCV's `GaussianBlur` function to apply a Gaussian filter to the image.
+It smooths the image, effectively retaining only the low-frequency components by averaging pixel values with their neighbors. 
+In order to change how low frequencies are retained, we can adjust the `kernel_size` and `sigma` parameters.
 ```python
 def low_pass_filter(image, kernel_size=21, sigma=10):
-    """
-    Apply low-pass filter (Gaussian blur) to retain low frequencies.
-    
-    Args:
-        image: Input image
-        kernel_size: Size of Gaussian kernel (must be odd)
-        sigma: Standard deviation controlling amount of smoothing
-    
-    Returns:
-        Low-pass filtered image
-    """
     return cv2.GaussianBlur(image, (kernel_size, kernel_size), sigma)
 ```
 
-**Gaussian Formula:**
-$$
-G(x,y) = \frac{1}{2\pi\sigma^2} e^{-\frac{x^2+y^2}{2\sigma^2}}
-$$
-
-**Parameters:**
-- **kernel_size:** Size of the convolution kernel (31×31 used)
-- **sigma:** Controls spread of the Gaussian
-  - Larger sigma → more smoothing → fewer frequencies retained
-  - Smaller sigma → less smoothing → more detail preserved
-
 #### High-Pass Filter Implementation
 
-Extract high frequencies by subtracting the low-pass filtered version from original:
-
+The high-pass filter is implemented by subtracting the low-pass filtered image from the original image.
+This removes the low-frequency components, leaving only the high-frequency details such as edges and textures.
 ```python
 def high_pass_filter(image, kernel_size=21, sigma=10):
-    """
-    Apply high-pass filter to retain high frequencies.
-    High-pass = Original - Low-pass
-    """
     low_pass = low_pass_filter(image, kernel_size, sigma)
     high_pass = image.astype(np.float64) - low_pass.astype(np.float64)
     return high_pass
 ```
 
-**Why This Works:**
-- Original image = Low frequencies + High frequencies
-- Subtracting low-pass removes low frequencies
-- Result contains only high frequencies (edges, details, textures)
 
-**Alternative approach (not used):**
-- Frequency domain: FFT → apply high-pass filter → inverse FFT
-- More complex but allows precise frequency cutoff
+Alternatively, we could have implemented high-pass filtering in the frequency domain using FFT which allows for more precise frequency cutoff.
+Since this approach is more complex, spatial domain filtering was chosen for simplicity.
 
 #### Hybrid Image Creation
 
-Combine low frequencies from one image with high frequencies from another:
+To create a hybrid image, we just combine low frequencies from one image with high frequencies from another.
+All we do is get the numpy arrays of both filtered images and add them together, clipping the result to valid pixel values [0, 255].
+We will apply a low-pass filter to the elephant image and a high-pass filter to the cheetah image.
 
 ```python
 def create_hybrid_image(image_low, image_high, sigma_low=10, sigma_high=5):
-    """
-    Create hybrid image by combining filtered images.
-    """
     # Apply low-pass to elephant (retain overall shape)
     low_freq = low_pass_filter(image_low, kernel_size=31, sigma=sigma_low)
     
@@ -318,16 +236,11 @@ def create_hybrid_image(image_low, image_high, sigma_low=10, sigma_high=5):
     return hybrid, low_freq, high_freq
 ```
 
-**Key Points:**
-- Must convert to float64 for arithmetic (prevents overflow)
-- Addition can produce values outside [0, 255] → clipping needed
-- Low-pass output is uint8, high-pass can be negative → careful type handling
-
 ---
 
 ### Experiments:
 
-We tested three combinations of sigma values to find optimal balance:
+Three different combinations of `σ_low` and `σ_high` were tested to observe their effects on the hybrid image.
 
 | Experiment | σ_low | σ_high | Description |
 |------------|-------|--------|-------------|
@@ -335,118 +248,24 @@ We tested three combinations of sigma values to find optimal balance:
 | 2 | 10 | 5 | Balanced |
 | 3 | 5 | 8 | Less blur in low, softer high |
 
-#### Experiment 1: σ_low=15, σ_high=3
+#### Experiment 1: σ_low=15, σ_high=3 ✓ **Best Result**
 
 ##### Low-Pass (Elephant, σ=15)
 ![Experiment 1 Low-Pass](output_part_b/1_low_pass_sigma_15.png)
 
-**Result:** Very blurred elephant
-- Overall shape visible but extremely smooth
-- Almost no detail retained
-- Too much smoothing for optimal hybrid
-
 ##### High-Pass (Cheetah, σ=3)
 ![Experiment 1 High-Pass](output_part_b/1_high_pass_sigma_3.png)
-
-**Result:** Very sharp edge extraction
-- Strong, detailed spot patterns
-- High contrast edges
-- Perhaps too strong, dominates even at medium distances
 
 ##### Hybrid Image (σ_low=15, σ_high=3)
 ![Experiment 1 Hybrid](output_part_b/1_hybrid_15_3.png)
 
-**Assessment:** Cheetah dominates too much at close range. Transition point is too far.
-
----
-
-#### Experiment 2: σ_low=10, σ_high=5 ✓ **Best Result**
-
-##### Low-Pass (Elephant, σ=10)
-![Experiment 2 Low-Pass](output_part_b/2_low_pass_sigma_10.png)
-
-**Result:** Balanced blurring
-- Elephant shape clearly preserved
-- Smooth edges without excessive detail loss
-- Good balance for hybrid effect
-
-##### High-Pass (Cheetah, σ=5)
-![Experiment 2 High-Pass](output_part_b/2_high_pass_sigma_5.png)
-
-**Result:** Balanced edge extraction
-- Clear spot patterns
-- Good edge definition
-- Not too harsh or too soft
-
-##### Hybrid Image (σ_low=10, σ_high=5) ✓
-![Experiment 2 Hybrid](output_part_b/2_hybrid_10_5.png)
-
-**Assessment:** Optimal balance! Clear cheetah up close, clear elephant from far away.
-
----
-
-#### Experiment 3: σ_low=5, σ_high=8
-
-##### Low-Pass (Elephant, σ=5)
-![Experiment 3 Low-Pass](output_part_b/3_low_pass_sigma_5.png)
-
-**Result:** Mild blurring
-- Too much detail retained
-- Elephant visible even at close distances
-- Reduces hybrid effect
-
-##### High-Pass (Cheetah, σ=8)
-![Experiment 3 High-Pass](output_part_b/3_high_pass_sigma_8.png)
-
-**Result:** Soft edge extraction
-- Muted spot patterns
-- Less contrast
-- Details too subtle
-
-##### Hybrid Image (σ_low=5, σ_high=8)
-![Experiment 3 Hybrid](output_part_b/3_hybrid_5_8.png)
-
-**Assessment:** Elephant interferes with cheetah perception at close range. Transition not dramatic enough.
+Although I'd like to the two images to line up better, this combination showed a strong hybrid effect and gave the best results overall.
+Close up, the cheetah's features are clear and as you move away, the cheetah fades and the elephant shape becomes prominent.
+Below are the results from all experiments for comparison.
 
 ---
 
 ### Comparison of All Experiments:
 ![Comparison](output_part_b/comparison.png)
 
-**Summary:**
-- **Experiment 1 (15, 3):** High frequencies too dominant
-- **Experiment 2 (10, 5):** ✓ Best balance - recommended
-- **Experiment 3 (5, 8):** Low frequencies too dominant
-
 ---
-
-### Distance Simulation:
-
-To demonstrate the hybrid effect, we show the same image at different scales (simulating viewing distances):
-
-![Distance Simulation](output_part_b/distance_simulation.png)
-
-**Perception at Different Distances:**
-
-| Distance | Size | What You See | Explanation |
-|----------|------|--------------|-------------|
-| **Close (0-2 ft)** | 100% | Cheetah spots dominate | High frequencies visible at close range |
-| **Medium (3-5 ft)** | 50% | Both images visible | Transitional state |
-| **Far (6-10 ft)** | 25% | Elephant shape emerges | Low frequencies dominate |
-| **Very Far (10+ ft)** | 12.5% | Clear elephant | Only low frequencies visible |
-
----
-
-### Results Analysis:
-
-#### Why the Hybrid Effect Works:
-
-**Human Visual System:**
-- Processes images through multiple spatial frequency channels
-- High-frequency details require close viewing to resolve
-- Low-frequency structures visible at all distances but dominate at far viewing
-
-**Visual Acuity:**
-- Decreases with distance
-- At close range: Can resolve fine details (spots, edges)
-- At far range: Only coarse structures visible (overall shape)

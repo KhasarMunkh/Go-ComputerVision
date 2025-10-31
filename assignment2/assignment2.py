@@ -103,11 +103,11 @@ def part1():
     axes[0, 1].axis("off")
 
     axes[0, 2].imshow(Gx, cmap="gray")
-    axes[0, 2].set_title("Gradient Gx (Horizontal Edges)")
+    axes[0, 2].set_title("Gradient Gx (Vertical Edges)")
     axes[0, 2].axis("off")
 
     axes[1, 0].imshow(Gy, cmap="gray")
-    axes[1, 0].set_title("Gradient Gy (Vertical Edges)")
+    axes[1, 0].set_title("Gradient Gy (Horizontal Edges)")
     axes[1, 0].axis("off")
 
     axes[1, 1].imshow(gradient_magnitude, cmap="gray")
@@ -132,18 +132,6 @@ import cv2
 
 
 def low_pass_filter(image, kernel_size=21, sigma=10):
-    """
-    Apply low-pass filter (Gaussian blur) to retain low frequencies.
-
-    Args:
-        image: Input image
-        kernel_size: Size of Gaussian kernel
-        sigma: Standard deviation for Gaussian
-
-    Returns:
-        Low-pass filtered image
-    """
-    # Use OpenCV's Gaussian blur for efficiency
     return cv2.GaussianBlur(image, (kernel_size, kernel_size), sigma)
 
 
@@ -158,19 +146,6 @@ def high_pass_filter(image, kernel_size=21, sigma=10):
 
 
 def create_hybrid_image(image_low, image_high, sigma_low=10, sigma_high=5):
-    """
-    Create a hybrid image by combining low frequencies from one image
-    and high frequencies from another.
-
-    Args:
-        image_low: Image to extract low frequencies from
-        image_high: Image to extract high frequencies from
-        sigma_low: Sigma for low-pass filter
-        sigma_high: Sigma for high-pass filter
-
-    Returns:
-        Hybrid image
-    """
     # Apply low-pass to first image
     low_freq = low_pass_filter(image_low, kernel_size=31, sigma=sigma_low)
 
@@ -275,22 +250,6 @@ def part2():
     plt.tight_layout()
     plt.savefig(f"{output_dir_part_b}/comparison.png", dpi=150)
     plt.close()
-
-    # Simulate viewing at different distances
-    best_hybrid = results[1]["hybrid"]  # Use balanced version
-
-    fig, axes = plt.subplots(2, 2, figsize=(10, 10))
-    sizes = [1.0, 0.5, 0.25, 0.125]
-    titles = ["Close (100%)", "Medium (50%)", "Far (25%)", "Very Far (12.5%)"]
-
-    for ax, size, title in zip(axes.flat, sizes, titles):
-        resized = cv2.resize(best_hybrid, None, fx=size, fy=size)
-        ax.imshow(resized)
-        ax.set_title(title)
-        ax.axis("off")
-
-    plt.tight_layout()
-    plt.savefig(f"{output_dir_part_b}/distance_simulation.png", dpi=150)
 
 
 def main():
