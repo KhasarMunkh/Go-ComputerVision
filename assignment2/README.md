@@ -1,10 +1,9 @@
-
 ## install dependencies 
 ```bash
 pip install -r requirements.txt
 ```
 
-## run the app
+## to run:
 ```bash
 python assignment2.py
 ```
@@ -32,8 +31,8 @@ The edge detection pipeline consists of three main steps:
 
 #### Step 1: Custom 2D Convolution
 
-First, we implement a custom convolution function without using CV libraries. The function handles borders using reflection padding to avoid edge artifacts.
-
+First, we implement a custom convolution function. The function below takes an image and a kernel as inputs and returns the convolved image. 
+We handle borders using reflection padding to avoid dark borders. The convolution sets the output image pixels to the sum of element-wise products of the kernel and the corresponding image region.
 ```python
 def convolve(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     img_h, img_w = img.shape
@@ -41,7 +40,7 @@ def convolve(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
 
     assert k_h % 2 == 1 and k_w % 2 == 1, "Kernel dimensions should be odd."
 
-    padding_y = k_h // 2
+    padding_y = k_h // 2  #5 // 2 = 2
     padding_x = k_w // 2
 
     # Use reflection padding to handle borders
@@ -50,36 +49,23 @@ def convolve(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
         img, ((padding_y, padding_y), (padding_x, padding_x)), mode="reflect"
     )
 
+    # Initialize output image with dimensions same as input image
     output = np.zeros((img_h, img_w), dtype=np.float32)
 
     # Perform convolution
     for i in range(img_h):
         for j in range(img_w):
             region = padded_img[i : i + k_h, j : j + k_w]
-            conv_value = np.sum(region * kernel)
+            conv_value = np.sum(region * kernel) ## Element-wise multiplication and sum
             output[i, j] = conv_value
 
     return output
 ```
 
-**Border Handling:**
-- Used reflection padding (`mode="reflect"`) to avoid dark borders
-- When kernel extends beyond image boundary, edge pixels are mirrored
-- Alternative approaches like zero-padding would create artificial edges at borders
-
 #### Step 2: Gaussian Smoothing
 
-Apply the 5×5 Gaussian kernel specified in the assignment (normalized by dividing by 273):
-
-$$
-G = \frac{1}{273} \begin{bmatrix}
-1 & 4 & 7 & 4 & 1 \\
-4 & 16 & 26 & 16 & 4 \\
-7 & 26 & 41 & 26 & 7 \\
-4 & 16 & 26 & 16 & 4 \\
-1 & 4 & 7 & 4 & 1
-\end{bmatrix}
-$$
+Below, we define the 5×5 Gaussian kernel specified to smooth the image. It is normalized by dividing by 273 to ensure the sum of the kernel equals 1.
+We then convolve the input image with this kernel.
 
 ```python
 # Gaussian kernel (normalized)
@@ -101,15 +87,11 @@ G = (
 building_smoothed = convolve(building_image_pixels, G)
 ```
 
-**Purpose of Gaussian Smoothing:**
-- Reduces high-frequency noise that could be detected as false edges
-- Acts as low-pass filter to blur fine details
-- Weighted average with nearby pixels (center pixel weighted most heavily)
 
 #### Step 3: Sobel Edge Detection
 
-Apply Sobel operators to compute gradients in x and y directions:
-
+Sobel operators are used to compute the image gradients in both x and y directions. The kernels are emphasize edges by combining differentiation and smoothing.
+We define the Sobel kernels Kx and Ky as follows:
 **Horizontal Gradient (Kx):** Detects vertical edges
 $$
 K_x = \begin{bmatrix}
@@ -128,6 +110,12 @@ K_y = \begin{bmatrix}
 \end{bmatrix}
 $$
 
+**How Sobel Works:**
+- Kx responds to intensity changes in x-direction (vertical edges)
+- Ky responds to intensity changes in y-direction (horizontal edges)
+- Combines smoothing (perpendicular direction) and differentiation (gradient direction)
+    
+Apply Sobel operators to compute gradients in x and y directions:
 ```python
 # Sobel kernels
 Kx = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=np.float32)
@@ -138,16 +126,12 @@ Gx = convolve(building_smoothed, Kx)
 Gy = convolve(building_smoothed, Ky)
 ```
 
-**How Sobel Works:**
-- Kx responds to intensity changes in x-direction (vertical edges)
-- Ky responds to intensity changes in y-direction (horizontal edges)
-- Combines smoothing (perpendicular direction) and differentiation (gradient direction)
-- Center row/column weighted more heavily (-2, 2) than edges (-1, 1)
+Gx and Gy are the horizontal and vertical gradients, respectively.
 
 #### Step 4: Gradient Magnitude
 
-Combine the directional gradients into a single edge strength measure:
-
+Now, we combine the directional gradients into a single edge strength measure.
+Gx and Gy represent perpendicular components of the gradient vector. So, we can use the Euclidean norm to compute overall edge strength:
 $$
 \text{Gradient Magnitude} = \sqrt{G_x^2 + G_y^2}
 $$
@@ -161,12 +145,6 @@ gradient_magnitude_normalized = (
     gradient_magnitude / np.max(gradient_magnitude)
 ) * 255.0
 ```
-
-**Why Square Root of Sum of Squares:**
-- Treats x and y gradients as perpendicular components of a vector
-- Magnitude gives edge strength independent of direction
-- Ensures positive values (edges are always positive)
-- Euclidean distance in gradient space
 
 ---
 
@@ -219,31 +197,16 @@ The final edge detection successfully identifies:
 
 ### Analysis:
 
-**Quality Assessment:**
-1. **Gaussian Smoothing Effect:** Successfully reduced noise while preserving major edges. The 5×5 kernel provides good balance.
-
-2. **Gradient Components:**
+1. **Gradient Components:**
    - **Gx:** Strongly responds to vertical building edges and window frames
    - **Gy:** Clearly detects horizontal roof line and window edges
    - Both show good contrast between edges and background
 
-3. **Edge Magnitude:** 
+2. **Edge Magnitude:** 
    - All major structural boundaries detected
    - Edge thickness: 2-3 pixels (typical for Sobel without thinning)
    - Good signal-to-noise ratio
    - No visible artifacts from border handling
-
-**Limitations:**
-- Processing time: ~30-45 seconds for 5472×3648 image (nested loops, not vectorized)
-- Weak texture edges in uniform regions not detected
-- No non-maximum suppression (edges not thinned to single pixel)
-- No thresholding to remove very weak edges
-
-**Potential Improvements:**
-- Add non-maximum suppression for thinner edges
-- Implement double thresholding (Canny edge detection)
-- Vectorize convolution for faster processing
-- Experiment with different Gaussian sigma values
 
 ---
 
