@@ -6,7 +6,7 @@ pip install -r requirements.txt
 
 ## run the app
 ```bash
-python app.py
+python assignment2.py
 ```
 
 # Assignment 2: Edge Detection and Hybrid Images
