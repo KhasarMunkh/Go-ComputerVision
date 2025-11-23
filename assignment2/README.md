@@ -10,17 +10,7 @@ python assignment2.py
 
 # Assignment 2: Edge Detection and Hybrid Images
 
-## Part A: Edge Detection from Scratch
-
-**a) For part a), you will have to write the code without the use of computer vision libraries (other than to use functions to read and write images). The objective is to try a simple approach to find the edges in the following grayscale image.**
-
-**1) Start by smoothing the image by applying the following Gaussian kernel:**
-
-**2) Convolve your smoothed image with the Sobel Kernels Kx and Ky to compute the derivatives with respect to x (Gx) and y (Gy).**
-
-**Compute the magnitude of the gradient (√(Gx² + Gy²)) at each pixel and display the results in a grayscale image. Describe the results.**
-
----
+## Part A: 
 
 ### Approach:
 

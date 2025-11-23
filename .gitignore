@@ -1,2 +1,7 @@
 *.md
 output/
+*.pdf
+__pycache__/
+*deliverables/
+*.zip
+*.docx
