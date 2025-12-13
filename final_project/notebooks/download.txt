@@ -1,0 +1,543 @@
+7.7s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+7.7s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+7.7s 3 0.00s - to python to disable frozen modules.
+7.7s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+8.2s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.2s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.2s 7 0.00s - to python to disable frozen modules.
+8.2s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+14.7s 9 Using device: cuda
+14.7s 10 GPU: Tesla T4
+14.7s 11 === EXPERIMENT: WLASL100 with 180 landmarks ===
+14.7s 12 Input dim: 540
+14.7s 13 Landmarks: Hands (42) + Pose (6) + Face (132) = 180 total
+14.7s 14 Model: lstm_attention
+14.7s 15 This tests whether face landmarks improve accuracy vs 48-landmark baseline
+14.8s 16 Available files in mutemotion-output:
+14.8s 17 total 14G
+14.8s 18 -rw-r--r-- 1 nobody nogroup 2.2K Dec 11 08:29 filtered_labels.txt
+14.8s 19 -rw-r--r-- 1 nobody nogroup 2.6M Dec 11 08:29 labels.npz
+14.8s 20 -rw-r--r-- 1 nobody nogroup 2.6G Dec 11 08:30 landmarks_V1.npz
+14.8s 21 -rw-r--r-- 1 nobody nogroup 2.6G Dec 11 08:30 landmarks_V2.npz
+14.8s 22 -rw-r--r-- 1 nobody nogroup 8.4G Dec 11 08:36 landmarks_V3.npz
+14.8s 23 -rw-r--r-- 1 nobody nogroup 4.0M Dec 11 08:29 WLASL_parsed_data.json
+14.9s 24 Loading pre-extracted landmarks into memory...
+66.0s 25 Loaded 21083 video landmarks into memory
+66.0s 26 Sample shape: (81, 180, 3)  (frames, landmarks, coords)
+66.1s 27 Total samples in JSON: 21083
+66.1s 28 
+66.1s 29 Sample entry:
+66.1s 30 {
+66.1s 31 "gloss": "book",
+66.1s 32 "video_path": "/kaggle/input/wlasl-processed/videos/69241.mp4",
+66.1s 33 "frame_start": 1,
+66.1s 34 "frame_end": -1,
+66.1s 35 "split": "train"
+66.1s 36 }
+66.1s 37 Total unique glosses: 2000
+66.1s 38 
+66.1s 39 Top 10 glosses:
+66.1s 40 book: 40 samples
+66.1s 41 drink: 35 samples
+66.1s 42 computer: 30 samples
+66.1s 43 before: 26 samples
+66.1s 44 chair: 26 samples
+66.1s 45 go: 26 samples
+66.1s 46 clothes: 25 samples
+66.1s 47 who: 25 samples
+66.1s 48 candy: 24 samples
+66.1s 49 cousin: 23 samples
+66.1s 50 Augmentation functions defined.
+66.2s 51 Classes: 100
+66.2s 52 Train: 1442, Val: 338, Test: 258
+66.2s 53 
+66.2s 54 Dataset sizes:
+66.2s 55 Train: 1442
+66.2s 56 Val: 338
+66.2s 57 Test: 258
+66.3s 58 Sample shape: torch.Size([60, 540])
+66.3s 59 Label: 0 (book)
+66.9s 60 Model: lstm_attention
+66.9s 61 Input dim: 540
+66.9s 62 Parameters: 3,499,877
+71.5s 63 Starting training for 100 epochs...
+71.5s 64 Augmentation: True
+71.5s 65 
+71.5s 66 /usr/local/lib/python3.11/dist-packages/torch/optim/lr_scheduler.py:62: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
+71.5s 67 warnings.warn(
+71.5s 68 
+71.5s 69 /usr/local/lib/python3.11/dist-packages/torch/optim/lr_scheduler.py:62: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
+71.5s 70 warnings.warn(
+71.6s 71 Epoch 1/100
+121.3s 72 Train Loss: 4.6142, Train Acc: 0.0187
+121.3s 73 Val Loss: 4.6045, Val Acc: 0.0178
+121.3s 74 -> Saved best model (val_acc: 0.0178)
+121.3s 75 
+121.3s 76 Epoch 2/100
+170.5s 77 Train Loss: 4.6037, Train Acc: 0.0153
+170.5s 78 Val Loss: 4.6005, Val Acc: 0.0178
+170.5s 79 
+170.5s 80 Epoch 3/100
+219.6s 81 Train Loss: 4.5746, Train Acc: 0.0243
+219.6s 82 Val Loss: 4.5434, Val Acc: 0.0325
+219.6s 83 -> Saved best model (val_acc: 0.0325)
+219.6s 84 
+219.6s 85 Epoch 4/100
+268.5s 86 Train Loss: 4.4411, Train Acc: 0.0298
+268.5s 87 Val Loss: 4.3262, Val Acc: 0.0355
+268.5s 88 -> Saved best model (val_acc: 0.0355)
+268.5s 89 
+268.5s 90 Epoch 5/100
+316.1s 91 Train Loss: 4.3242, Train Acc: 0.0284
+316.1s 92 Val Loss: 4.2577, Val Acc: 0.0355
+316.1s 93 
+316.1s 94 Epoch 6/100
+364.4s 95 Train Loss: 4.2705, Train Acc: 0.0291
+364.4s 96 Val Loss: 4.2416, Val Acc: 0.0385
+364.4s 97 -> Saved best model (val_acc: 0.0385)
+364.4s 98 
+364.4s 99 Epoch 7/100
+413.0s 100 Train Loss: 4.2224, Train Acc: 0.0250
+413.0s 101 Val Loss: 4.2201, Val Acc: 0.0385
+413.0s 102 
+413.0s 103 Epoch 8/100
+461.1s 104 Train Loss: 4.2003, Train Acc: 0.0298
+461.1s 105 Val Loss: 4.2114, Val Acc: 0.0325
+461.1s 106 
+461.1s 107 Epoch 9/100
+508.7s 108 Train Loss: 4.1769, Train Acc: 0.0326
+508.7s 109 Val Loss: 4.1982, Val Acc: 0.0266
+508.7s 110 
+508.7s 111 Epoch 10/100
+556.7s 112 Train Loss: 4.1824, Train Acc: 0.0347
+556.7s 113 Val Loss: 4.1798, Val Acc: 0.0385
+556.7s 114 
+556.7s 115 Epoch 11/100
+605.1s 116 Train Loss: 4.1667, Train Acc: 0.0319
+605.1s 117 Val Loss: 4.1989, Val Acc: 0.0355
+605.1s 118 
+605.1s 119 Epoch 12/100
+652.3s 120 Train Loss: 4.1548, Train Acc: 0.0347
+652.3s 121 Val Loss: 4.1635, Val Acc: 0.0355
+652.3s 122 
+652.3s 123 Epoch 13/100
+699.3s 124 Train Loss: 4.1352, Train Acc: 0.0326
+699.3s 125 Val Loss: 4.1840, Val Acc: 0.0385
+699.3s 126 
+699.3s 127 Epoch 14/100
+747.2s 128 Train Loss: 4.1144, Train Acc: 0.0354
+747.2s 129 Val Loss: 4.1274, Val Acc: 0.0385
+747.2s 130 
+747.2s 131 Epoch 15/100
+793.4s 132 Train Loss: 4.0805, Train Acc: 0.0458
+793.4s 133 Val Loss: 4.1510, Val Acc: 0.0503
+793.4s 134 -> Saved best model (val_acc: 0.0503)
+793.4s 135 
+793.4s 136 Epoch 16/100
+840.2s 137 Train Loss: 4.1045, Train Acc: 0.0395
+840.2s 138 Val Loss: 4.0977, Val Acc: 0.0444
+840.2s 139 
+840.2s 140 Epoch 17/100
+886.6s 141 Train Loss: 4.0468, Train Acc: 0.0444
+886.6s 142 Val Loss: 4.0965, Val Acc: 0.0473
+886.6s 143 
+886.6s 144 Epoch 18/100
+932.0s 145 Train Loss: 4.0532, Train Acc: 0.0423
+932.0s 146 Val Loss: 4.0590, Val Acc: 0.0444
+932.0s 147 
+932.0s 148 Epoch 19/100
+978.1s 149 Train Loss: 4.0479, Train Acc: 0.0423
+978.1s 150 Val Loss: 4.0659, Val Acc: 0.0503
+978.1s 151 
+978.1s 152 Epoch 20/100
+1025.6s 153 Train Loss: 4.0350, Train Acc: 0.0513
+1025.6s 154 Val Loss: 4.0868, Val Acc: 0.0562
+1025.6s 155 -> Saved best model (val_acc: 0.0562)
+1025.6s 156 
+1025.6s 157 Epoch 21/100
+1074.9s 158 Train Loss: 4.0077, Train Acc: 0.0444
+1074.9s 159 Val Loss: 4.0276, Val Acc: 0.0533
+1074.9s 160 
+1074.9s 161 Epoch 22/100
+1122.4s 162 Train Loss: 3.9981, Train Acc: 0.0520
+1122.4s 163 Val Loss: 3.9996, Val Acc: 0.0533
+1122.4s 164 
+1122.4s 165 Epoch 23/100
+1168.5s 166 Train Loss: 3.9751, Train Acc: 0.0485
+1168.5s 167 Val Loss: 4.0385, Val Acc: 0.0533
+1168.5s 168 
+1168.5s 169 Epoch 24/100
+1215.5s 170 Train Loss: 3.9792, Train Acc: 0.0458
+1215.5s 171 Val Loss: 4.0414, Val Acc: 0.0503
+1215.5s 172 
+1215.5s 173 Epoch 25/100
+1263.8s 174 Train Loss: 3.9032, Train Acc: 0.0569
+1263.8s 175 Val Loss: 3.9675, Val Acc: 0.0562
+1263.8s 176 
+1263.8s 177 Epoch 26/100
+1311.6s 178 Train Loss: 3.9414, Train Acc: 0.0485
+1311.6s 179 Val Loss: 3.9552, Val Acc: 0.0621
+1311.6s 180 -> Saved best model (val_acc: 0.0621)
+1311.6s 181 
+1311.6s 182 Epoch 27/100
+1360.2s 183 Train Loss: 3.9029, Train Acc: 0.0472
+1360.2s 184 Val Loss: 3.9771, Val Acc: 0.0621
+1360.2s 185 
+1360.2s 186 Epoch 28/100
+1408.0s 187 Train Loss: 3.8993, Train Acc: 0.0569
+1408.0s 188 Val Loss: 3.9857, Val Acc: 0.0562
+1408.0s 189 
+1408.0s 190 Epoch 29/100
+1455.9s 191 Train Loss: 3.8958, Train Acc: 0.0527
+1455.9s 192 Val Loss: 3.9128, Val Acc: 0.0680
+1455.9s 193 -> Saved best model (val_acc: 0.0680)
+1455.9s 194 
+1455.9s 195 Epoch 30/100
+1505.0s 196 Train Loss: 3.9122, Train Acc: 0.0569
+1505.0s 197 Val Loss: 3.9088, Val Acc: 0.0799
+1505.0s 198 -> Saved best model (val_acc: 0.0799)
+1505.0s 199 
+1505.0s 200 Epoch 31/100
+1552.3s 201 Train Loss: 3.8599, Train Acc: 0.0541
+1552.3s 202 Val Loss: 3.9190, Val Acc: 0.0710
+1552.3s 203 
+1552.3s 204 Epoch 32/100
+1600.5s 205 Train Loss: 3.8374, Train Acc: 0.0569
+1600.5s 206 Val Loss: 3.8427, Val Acc: 0.0740
+1600.5s 207 
+1600.5s 208 Epoch 33/100
+1645.9s 209 Train Loss: 3.8077, Train Acc: 0.0680
+1645.9s 210 Val Loss: 3.9163, Val Acc: 0.0651
+1645.9s 211 
+1645.9s 212 Epoch 34/100
+1693.5s 213 Train Loss: 3.8376, Train Acc: 0.0617
+1693.5s 214 Val Loss: 3.8688, Val Acc: 0.0680
+1693.5s 215 
+1693.5s 216 Epoch 35/100
+1739.3s 217 Train Loss: 3.7954, Train Acc: 0.0680
+1739.3s 218 Val Loss: 3.8304, Val Acc: 0.0710
+1739.3s 219 
+1739.3s 220 Epoch 36/100
+1786.6s 221 Train Loss: 3.7833, Train Acc: 0.0756
+1786.6s 222 Val Loss: 3.8177, Val Acc: 0.0651
+1786.6s 223 
+1786.6s 224 Epoch 37/100
+1833.8s 225 Train Loss: 3.7461, Train Acc: 0.0700
+1833.8s 226 Val Loss: 3.8053, Val Acc: 0.0740
+1833.8s 227 
+1833.8s 228 Epoch 38/100
+1882.2s 229 Train Loss: 3.7190, Train Acc: 0.0770
+1882.2s 230 Val Loss: 3.7879, Val Acc: 0.0888
+1882.2s 231 -> Saved best model (val_acc: 0.0888)
+1882.2s 232 
+1882.2s 233 Epoch 39/100
+1927.6s 234 Train Loss: 3.6965, Train Acc: 0.0749
+1927.6s 235 Val Loss: 3.7810, Val Acc: 0.0947
+1927.6s 236 -> Saved best model (val_acc: 0.0947)
+1927.6s 237 
+1927.6s 238 Epoch 40/100
+1973.1s 239 Train Loss: 3.6876, Train Acc: 0.0659
+1973.1s 240 Val Loss: 3.7683, Val Acc: 0.0917
+1973.1s 241 
+1973.1s 242 Epoch 41/100
+2022.0s 243 Train Loss: 3.6729, Train Acc: 0.0832
+2022.0s 244 Val Loss: 3.7807, Val Acc: 0.0769
+2022.0s 245 
+2022.0s 246 Epoch 42/100
+2069.3s 247 Train Loss: 3.6506, Train Acc: 0.0846
+2069.3s 248 Val Loss: 3.7705, Val Acc: 0.0828
+2069.3s 249 
+2069.3s 250 Epoch 43/100
+2114.7s 251 Train Loss: 3.6743, Train Acc: 0.0763
+2114.7s 252 Val Loss: 3.7605, Val Acc: 0.0888
+2114.7s 253 
+2114.7s 254 Epoch 44/100
+2161.7s 255 Train Loss: 3.6553, Train Acc: 0.0707
+2161.7s 256 Val Loss: 3.7579, Val Acc: 0.0828
+2161.7s 257 
+2161.7s 258 Epoch 45/100
+2208.5s 259 Train Loss: 3.6785, Train Acc: 0.0804
+2208.5s 260 Val Loss: 3.7528, Val Acc: 0.0976
+2208.5s 261 -> Saved best model (val_acc: 0.0976)
+2208.5s 262 
+2208.5s 263 Epoch 46/100
+2254.8s 264 Train Loss: 3.5933, Train Acc: 0.0811
+2254.8s 265 Val Loss: 3.7204, Val Acc: 0.0917
+2254.8s 266 
+2254.8s 267 Epoch 47/100
+2301.4s 268 Train Loss: 3.6506, Train Acc: 0.0874
+2301.4s 269 Val Loss: 3.7088, Val Acc: 0.0740
+2301.4s 270 
+2301.4s 271 Epoch 48/100
+2348.9s 272 Train Loss: 3.5938, Train Acc: 0.0770
+2348.9s 273 Val Loss: 3.7280, Val Acc: 0.0976
+2348.9s 274 
+2348.9s 275 Epoch 49/100
+2395.2s 276 Train Loss: 3.5873, Train Acc: 0.0943
+2395.2s 277 Val Loss: 3.7221, Val Acc: 0.0858
+2395.2s 278 
+2395.2s 279 Epoch 50/100
+2442.1s 280 Train Loss: 3.5562, Train Acc: 0.0908
+2442.1s 281 Val Loss: 3.7044, Val Acc: 0.1124
+2442.1s 282 -> Saved best model (val_acc: 0.1124)
+2442.1s 283 
+2442.1s 284 Epoch 51/100
+2489.9s 285 Train Loss: 3.5767, Train Acc: 0.0846
+2489.9s 286 Val Loss: 3.6810, Val Acc: 0.1006
+2489.9s 287 
+2489.9s 288 Epoch 52/100
+2537.2s 289 Train Loss: 3.5658, Train Acc: 0.0832
+2537.2s 290 Val Loss: 3.6891, Val Acc: 0.0976
+2537.2s 291 
+2537.2s 292 Epoch 53/100
+2585.0s 293 Train Loss: 3.5563, Train Acc: 0.0867
+2585.0s 294 Val Loss: 3.7231, Val Acc: 0.0947
+2585.0s 295 
+2585.0s 296 Epoch 54/100
+2632.5s 297 Train Loss: 3.5895, Train Acc: 0.0846
+2632.5s 298 Val Loss: 3.6613, Val Acc: 0.0976
+2632.5s 299 
+2632.5s 300 Epoch 55/100
+2681.6s 301 Train Loss: 3.5459, Train Acc: 0.0943
+2681.6s 302 Val Loss: 3.7145, Val Acc: 0.0947
+2681.6s 303 
+2681.6s 304 Epoch 56/100
+2731.9s 305 Train Loss: 3.5498, Train Acc: 0.0964
+2731.9s 306 Val Loss: 3.6722, Val Acc: 0.1006
+2731.9s 307 
+2731.9s 308 Epoch 57/100
+2782.7s 309 Train Loss: 3.5233, Train Acc: 0.0950
+2782.7s 310 Val Loss: 3.6444, Val Acc: 0.1006
+2782.7s 311 
+2782.7s 312 Epoch 58/100
+2830.1s 313 Train Loss: 3.4562, Train Acc: 0.0908
+2830.1s 314 Val Loss: 3.6219, Val Acc: 0.1183
+2830.1s 315 -> Saved best model (val_acc: 0.1183)
+2830.1s 316 
+2830.1s 317 Epoch 59/100
+2878.4s 318 Train Loss: 3.4650, Train Acc: 0.1019
+2878.4s 319 Val Loss: 3.6209, Val Acc: 0.1065
+2878.4s 320 
+2878.4s 321 Epoch 60/100
+2927.6s 322 Train Loss: 3.4520, Train Acc: 0.1012
+2927.6s 323 Val Loss: 3.6282, Val Acc: 0.0917
+2927.6s 324 
+2927.6s 325 Epoch 61/100
+2975.4s 326 Train Loss: 3.5067, Train Acc: 0.1068
+2975.4s 327 Val Loss: 3.6257, Val Acc: 0.0976
+2975.4s 328 
+2975.4s 329 Epoch 62/100
+3023.0s 330 Train Loss: 3.4551, Train Acc: 0.0957
+3023.0s 331 Val Loss: 3.6504, Val Acc: 0.0917
+3023.0s 332 
+3023.0s 333 Epoch 63/100
+3069.9s 334 Train Loss: 3.5034, Train Acc: 0.0971
+3069.9s 335 Val Loss: 3.6206, Val Acc: 0.0976
+3069.9s 336 
+3069.9s 337 Epoch 64/100
+3116.8s 338 Train Loss: 3.4625, Train Acc: 0.1179
+3116.8s 339 Val Loss: 3.6295, Val Acc: 0.1065
+3116.8s 340 
+3116.8s 341 Epoch 65/100
+3163.8s 342 Train Loss: 3.4480, Train Acc: 0.1130
+3163.8s 343 Val Loss: 3.6154, Val Acc: 0.1065
+3163.8s 344 
+3163.8s 345 Epoch 66/100
+3212.0s 346 Train Loss: 3.4421, Train Acc: 0.1103
+3212.0s 347 Val Loss: 3.6078, Val Acc: 0.1036
+3212.0s 348 
+3212.0s 349 Epoch 67/100
+3259.9s 350 Train Loss: 3.4157, Train Acc: 0.1117
+3259.9s 351 Val Loss: 3.6100, Val Acc: 0.1036
+3259.9s 352 
+3259.9s 353 Epoch 68/100
+3307.7s 354 Train Loss: 3.4104, Train Acc: 0.1123
+3307.7s 355 Val Loss: 3.5997, Val Acc: 0.1036
+3307.7s 356 
+3307.7s 357 Epoch 69/100
+3355.0s 358 Train Loss: 3.4257, Train Acc: 0.1144
+3355.0s 359 Val Loss: 3.5954, Val Acc: 0.1095
+3355.0s 360 
+3355.0s 361 Epoch 70/100
+3402.7s 362 Train Loss: 3.4025, Train Acc: 0.1144
+3402.7s 363 Val Loss: 3.5937, Val Acc: 0.1006
+3402.7s 364 
+3402.7s 365 Epoch 71/100
+3450.0s 366 Train Loss: 3.3867, Train Acc: 0.1179
+3450.0s 367 Val Loss: 3.5916, Val Acc: 0.1124
+3450.0s 368 
+3450.0s 369 Epoch 72/100
+3497.9s 370 Train Loss: 3.4001, Train Acc: 0.1123
+3497.9s 371 Val Loss: 3.5945, Val Acc: 0.1095
+3497.9s 372 
+3497.9s 373 Epoch 73/100
+3547.0s 374 Train Loss: 3.4011, Train Acc: 0.1318
+3547.0s 375 Val Loss: 3.5901, Val Acc: 0.1065
+3547.0s 376 
+3547.0s 377 Early stopping at epoch 73
+3547.9s 378 ==================================================
+3547.9s 379 FINAL TEST RESULTS
+3547.9s 380 ==================================================
+3547.9s 381 Test Loss: 3.7799
+3547.9s 382 Test Accuracy (Top-1): 0.0814
+3548.3s 383 Test Accuracy (Top-5): 0.2791
+3548.3s 384 
+3548.3s 385 Top 10 best recognized signs:
+3548.3s 386 forget: 100.0%
+3548.3s 387 who: 66.7%
+3548.3s 388 book: 50.0%
+3548.3s 389 drink: 50.0%
+3548.3s 390 can: 50.0%
+3548.3s 391 family: 50.0%
+3548.3s 392 hearing: 50.0%
+3548.3s 393 wrong: 50.0%
+3548.3s 394 time: 50.0%
+3548.3s 395 basketball: 50.0%
+3548.3s 396 
+3548.3s 397 Top 10 hardest signs:
+3548.3s 398 need: 0.0%
+3548.3s 399 paint: 0.0%
+3548.3s 400 paper: 0.0%
+3548.3s 401 pull: 0.0%
+3548.3s 402 purple: 0.0%
+3548.3s 403 right: 0.0%
+3548.3s 404 same: 0.0%
+3548.3s 405 son: 0.0%
+3548.3s 406 tell: 0.0%
+3548.3s 407 thursday: 0.0%
+3548.4s 408 Model saved to /kaggle/working/sign_language_model.pt
+3548.4s 409 
+3548.4s 410 Download this file and use it with your local demo.py script!
+3548.4s 411 
+3548.4s 412 Note: This model uses 180 landmarks.
+3548.4s 413 Update your demo.py to extract the same landmarks.
+3548.5s 414 
+3548.5s 415 ============================================================
+3548.5s 416 TRAINING COMPLETE
+3548.5s 417 ============================================================
+3548.5s 418 Model: lstm_attention
+3548.5s 419 Dataset: WLASL100
+3548.5s 420 Landmarks: 180 (input_dim=540)
+3548.5s 421 Augmentation: True
+3548.5s 422 
+3548.5s 423 Results:
+3548.5s 424 Best Val Accuracy: 0.1183
+3548.5s 425 Test Accuracy (Top-1): 0.0814
+3548.5s 426 Test Accuracy (Top-5): 0.2791
+3548.5s 427 
+3548.5s 428 Files saved in /kaggle/working/:
+3548.5s 429 - checkpoints/best_*.pt
+3548.5s 430 - sign_language_model.pt
+3548.5s 431 - training_history.png
+3548.6s 432 
+3548.6s 433 ============================================================
+3548.6s 434 Training LSTM
+3548.6s 435 ============================================================
+3548.6s 436 Parameters: 3,368,292
+4027.6s 437 Epoch  10: train_acc=0.0284, val_acc=0.0355, best=0.0385
+4503.0s 438 Epoch  20: train_acc=0.0381, val_acc=0.0237, best=0.0385
+4644.3s 439 Early stopping at epoch 23
+4644.5s 440 
+4644.5s 441 LSTM Results:
+4644.5s 442 Best Val Acc: 0.0385
+4644.5s 443 Test Top-1:   0.0233
+4644.5s 444 Test Top-5:   0.1163
+4644.5s 445 
+4644.5s 446 ============================================================
+4644.5s 447 Training LSTM_ATTENTION
+4644.5s 448 ============================================================
+4644.5s 449 Parameters: 3,499,877
+5129.8s 450 Epoch  10: train_acc=0.0319, val_acc=0.0355, best=0.0355
+5609.1s 451 Epoch  20: train_acc=0.0395, val_acc=0.0296, best=0.0473
+6093.2s 452 Epoch  30: train_acc=0.0534, val_acc=0.0533, best=0.0533
+6584.2s 453 Epoch  40: train_acc=0.0645, val_acc=0.0621, best=0.0680
+7063.1s 454 Epoch  50: train_acc=0.0652, val_acc=0.0562, best=0.0680
+7063.3s 455 
+7063.3s 456 LSTM_ATTENTION Results:
+7063.3s 457 Best Val Acc: 0.0680
+7063.3s 458 Test Top-1:   0.0426
+7063.3s 459 Test Top-5:   0.1860
+7063.3s 460 
+7063.3s 461 ============================================================
+7063.3s 462 Training TRANSFORMER
+7063.3s 463 ============================================================
+7063.3s 464 Parameters: 2,339,172
+7540.5s 465 Epoch  10: train_acc=0.0180, val_acc=0.0178, best=0.0178
+7920.2s 466 Early stopping at epoch 18
+7920.4s 467 
+7920.4s 468 TRANSFORMER Results:
+7920.4s 469 Best Val Acc: 0.0178
+7920.4s 470 Test Top-1:   0.0155
+7920.4s 471 Test Top-5:   0.0775
+7920.4s 472 
+7920.4s 473 ============================================================
+7920.4s 474 MODEL COMPARISON COMPLETE
+7920.4s 475 ============================================================
+7922.1s 476 
+7922.1s 477 ======================================================================
+7922.1s 478 MODEL COMPARISON RESULTS
+7922.1s 479 ======================================================================
+7922.1s 480 Model Parameters Val Acc Test Top-1 Test Top-5  Epochs
+7922.1s 481 LSTM  3,368,292   3.85%      2.33%     11.63%      23
+7922.1s 482 LSTM + ATTENTION  3,499,877   6.80%      4.26%     18.60%      50
+7922.1s 483 TRANSFORMER  2,339,172   1.78%      1.55%      7.75%      18
+7922.1s 484 
+7922.1s 485 🏆 Best performing model: LSTM_ATTENTION with 4.26% Top-1 accuracy
+7924.3s 486 ======================================================================
+7924.3s 487 FINAL REPORT SUMMARY
+7924.3s 488 ======================================================================
+7924.3s 489 
+7924.3s 490 Dataset: WLASL100
+7924.3s 491 Landmarks: 180 (input_dim=540)
+7924.3s 492 Training samples: 1442
+7924.3s 493 Validation samples: 338
+7924.3s 494 Test samples: 258
+7924.3s 495 
+7924.3s 496 Data Augmentation: True
+7924.3s 497 Max Sequence Length: 60 frames
+7924.3s 498 
+7924.3s 499 ----------------------------------------------------------------------
+7924.3s 500 MODEL COMPARISON RESULTS
+7924.3s 501 ----------------------------------------------------------------------
+7924.3s 502 Model                  Parameters    Top-1 Acc    Top-5 Acc
+7924.3s 503 ----------------------------------------------------------------------
+7924.3s 504 LSTM                    3,368,292        2.33%       11.63%
+7924.3s 505 LSTM+ATTENTION          3,499,877        4.26%       18.60%
+7924.3s 506 TRANSFORMER             2,339,172        1.55%        7.75%
+7924.3s 507 ----------------------------------------------------------------------
+7924.3s 508 
+7924.3s 509 Best Model: LSTM+ATTENTION (4.26% Top-1)
+7924.3s 510 
+7924.3s 511 ----------------------------------------------------------------------
+7924.3s 512 COMPARISON WITH WLASL BENCHMARK (Li et al., WACV 2020)
+7924.3s 513 ----------------------------------------------------------------------
+7924.3s 514 Model                     Top-1      Top-5            Type
+7924.3s 515 ----------------------------------------------------------------------
+7924.3s 516 I3D (benchmark)          65.89%     84.11%       RGB video
+7924.3s 517 Pose-TGCN (benchmark)     55.43%     78.68%        Skeleton
+7924.3s 518 Pose-GRU (benchmark)     46.51%     76.74%        Skeleton
+7924.3s 519 Ours (LSTM)               2.33%     11.63%       MediaPipe
+7924.3s 520 Ours (LSTM)               4.26%     18.60%       MediaPipe
+7924.3s 521 Ours (TRANSFORMER)        1.55%      7.75%       MediaPipe
+7924.3s 522 ----------------------------------------------------------------------
+7924.3s 523 
+7924.3s 524 ======================================================================
+7924.3s 525 Files saved:
+7924.3s 526 - /kaggle/working/checkpoints/best_*.pt (model weights)
+7924.3s 527 - /kaggle/working/model_comparison_curves.png
+7924.3s 528 - /kaggle/working/model_comparison_bars.png
+7924.3s 529 - /kaggle/working/sign_language_model.pt (for demo)
+7924.3s 530 ======================================================================
+7930.7s 531 /usr/local/lib/python3.11/dist-packages/traitlets/traitlets.py:2915: FutureWarning: --Exporter.preprocessors=["remove_papermill_header.RemovePapermillHeader"] for containers is deprecated in traitlets 5.0. You can pass `--Exporter.preprocessors item` ... multiple times to add items to a list.
+7930.7s 532 warn(
+7930.8s 533 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+7931.7s 534 [NbConvertApp] Writing 2443727 bytes to __notebook__.ipynb
+7934.0s 535 /usr/local/lib/python3.11/dist-packages/traitlets/traitlets.py:2915: FutureWarning: --Exporter.preprocessors=["nbconvert.preprocessors.ExtractOutputPreprocessor"] for containers is deprecated in traitlets 5.0. You can pass `--Exporter.preprocessors item` ... multiple times to add items to a list.
+7934.0s 536 warn(
+7934.1s 537 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+7935.3s 538 [NbConvertApp] Support files will be in __results___files/
+7935.3s 539 [NbConvertApp] Making directory __results___files
+7935.3s 540 [NbConvertApp] Making directory __results___files
+7935.3s 541 [NbConvertApp] Making directory __results___files
+7935.3s 542 [NbConvertApp] Making directory __results___files
+7935.3s 543 [NbConvertApp] Writing 2048558 bytes to __results__.html

@@ -1,0 +1,29 @@
+# Dataset
+data:
+  dataset_path: "data/wlasl"
+  landmarks_path: "data/landmarks"
+  num_classes: 100  # Start with subset
+  max_seq_length: 60  # Max frames per video
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+
+# Model
+model:
+  type: "lstm"  # or "transformer"
+  input_dim: 63  # 21 landmarks * 3 coords
+  hidden_dim: 256
+  num_layers: 2
+  dropout: 0.3
+
+# Training
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  epochs: 50
+  early_stopping_patience: 10
+
+# Paths
+paths:
+  checkpoint_dir: "checkpoints"
+  log_dir: "logs"
